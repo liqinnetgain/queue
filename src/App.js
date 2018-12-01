@@ -4,7 +4,7 @@ import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 import firebase from "firebase";
 
-
+// Initialize Firebase
 
 class App extends Component {
   constructor(props) {
@@ -14,7 +14,8 @@ class App extends Component {
       cancelCode: 0,
       chatID: 0,
       isValid: true,
-      tokenNumber: 0
+      tokenNumber: 0,
+      currentToken: 0
     };
   }
   generateCancelCode() {
@@ -41,6 +42,18 @@ class App extends Component {
     });
     that.setState({ tokenNumber: fbToken });
     console.log("exit");
+    this.updateCurrentToken();
+  }
+
+  updateCurrentToken() {
+    var that = this;
+    var updateDb = firebase.database().ref("currentToken");
+    updateDb.on("value", function(snapshot) {
+      that.setState({ currentToken: snapshot.val() });
+    });
+    console.log(that.state.currentToken);
+    document.getElementById("tokenField").innerHTML =
+      "Current Token: " + that.state.currentToken;
   }
 
   render() {
@@ -53,7 +66,7 @@ class App extends Component {
           </p>
           <p>
             <hr />
-            <code>Current Token:</code>
+            <code id="tokenField">Current Token:</code>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <code>Next Token:</code>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -94,19 +107,5 @@ class App extends Component {
     );
   }
 }
-
-/*function addToFirebase() {
-  console.log("enter");
-  var that = this;
-  var chatid = document.getElementById("chatidField").value;
-  var name = document.getElementById("nameField").value;
-  console.log(that.tokenNumber);
-  var db = firebase.database();
-  db.ref(that.tokenNumber).set({
-    telegramID: chatid,
-    userName: name
-  });
-  console.log("exit");
-}*/
 
 export default App;
